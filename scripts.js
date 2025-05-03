@@ -42,23 +42,8 @@ document.getElementById('bet-form').addEventListener('submit', (e) => {
         return;
     }
 
-    // Validate date format (YYYY-MM-DD)
-    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-    if (!datePattern.test(date)) {
-        showAlert('Invalid date format. Use YYYY-MM-DD.', 'danger');
-        return;
-    }
-
-    // Ensure date is not in the future beyond today
-    const today = new Date().toISOString().split('T')[0];
-    if (date > today) {
-        showAlert('Cannot log bets for future dates.', 'danger');
-        return;
-    }
-
     bets[currentSport].push({ teams, date, amount });
     localStorage.setItem('bets', JSON.stringify(bets));
-    console.log("Saved bets:", JSON.parse(localStorage.getItem('bets'))); // Debug
 
     // Feedback
     if (amount > 0) {
@@ -81,7 +66,7 @@ function populateMonthSelect() {
     const months = new Set();
     sports.forEach(sport => {
         bets[sport].forEach(bet => {
-            if (bet.date && bet.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            if (bet.date) {
                 const month = bet.date.slice(0, 7); // YYYY-MM
                 months.add(month);
             }
@@ -91,9 +76,6 @@ function populateMonthSelect() {
     // Add current month
     const currentMonth = new Date().toISOString().slice(0, 7);
     months.add(currentMonth);
-
-    // Debug
-    console.log("Months found:", Array.from(months));
 
     // Sort months descending
     const sortedMonths = Array.from(months).sort().reverse();
@@ -131,7 +113,7 @@ function updateStats() {
     if (showAllSportsStats) {
         sports.forEach(sport => {
             bets[sport].forEach(bet => {
-                if (bet.date && bet.date.match(/^\d{4}-\d{2}-\d{2}$/) && bet.date.slice(0, 7) === selectedMonth) {
+                if (bet.date && bet.date.slice(0, 7) === selectedMonth) {
                     if (bet.amount > 0) monthlyWins++;
                     else monthlyLosses++;
                 }
@@ -139,7 +121,7 @@ function updateStats() {
         });
     } else {
         bets[currentSport].forEach(bet => {
-            if (bet.date && bet.date.match(/^\d{4}-\d{2}-\d{2}$/) && bet.date.slice(0, 7) === selectedMonth) {
+            if (bet.date && bet.date.slice(0, 7) === selectedMonth) {
                 if (bet.amount > 0) monthlyWins++;
                 else monthlyLosses++;
             }
@@ -191,23 +173,8 @@ document.getElementById('edit-form').addEventListener('submit', (e) => {
         return;
     }
 
-    // Validate date format
-    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-    if (!datePattern.test(date)) {
-        showAlert('Invalid date format. Use YYYY-MM-DD.', 'danger');
-        return;
-    }
-
-    // Ensure date is not in the future
-    const today = new Date().toISOString().split('T')[0];
-    if (date > today) {
-        showAlert('Cannot edit bets to future dates.', 'danger');
-        return;
-    }
-
     bets[currentSport][editIndex] = { teams, date, amount };
     localStorage.setItem('bets', JSON.stringify(bets));
-    console.log("Updated bets:", JSON.parse(localStorage.getItem('bets')));
 
     populateMonthSelect();
     updateStats();
@@ -219,7 +186,6 @@ function deleteBet(index) {
     if (confirm('Are you sure you want to delete this bet?')) {
         bets[currentSport].splice(index, 1);
         localStorage.setItem('bets', JSON.stringify(bets));
-        console.log("Deleted bet, updated bets:", JSON.parse(localStorage.getItem('bets')));
 
         populateMonthSelect();
         updateStats();
