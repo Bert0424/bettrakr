@@ -46,4 +46,64 @@
                             <input type="date" class="form-control" id="date" required>
                         </div>
                         <div class="mb-3">
-                            <label for="amount" class="form-label">Amount (positive for win, negative for
+                            <label for="amount" class="form-label">Amount (positive for win, negative for loss)</label>
+                            <input type="number" class="form-control" id="amount" step="0.01" placeholder="e.g., 50 or -50" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Log Bet</button>
+                        <button type="button" class="btn btn-secondary" onclick="showWelcomeModal()">Change Sport</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">Daily Bets</h2>
+                    <div id="bet-list"></div>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h2 id="stats-title" class="card-title">Monthly Stats (All Sports)</h2>
+                    <button id="toggle-stats-btn" class="btn btn-primary mb-3" onclick="toggleStatsView()">Show Sport Stats</button>
+                    <p id="monthly-stats">Monthly: 0 wins, 0 losses (0%)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="editModalLabel">Edit Bet</h2>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="mb-3">
+                                <label for="edit-teams" class="form-label">Team(s) Bet On</label>
+                                <input type="text" class="form-control" id="edit-teams" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="edit-date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-amount" class="form-label">Amount (positive for win, negative for loss)</label>
+                                <input type="number" class="form-control" id="edit-amount" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Alert Container -->
+        <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
