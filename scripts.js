@@ -20,7 +20,6 @@ function selectSport(sport) {
     document.getElementById('sport-title').textContent = `${sport.charAt(0).toUpperCase() + sport.slice(1)} Bets`;
     document.getElementById('main-content').classList.remove('d-none');
     bootstrap.Modal.getInstance(document.getElementById('welcomeModal')).hide();
-    populateMonthSelect();
     updateStats();
     displayBets();
 }
@@ -52,44 +51,23 @@ document.getElementById('bet-form').addEventListener('submit', (e) => {
         showAlert('We’ll get them next time!', 'warning');
     }
 
-    populateMonthSelect();
     updateStats();
     displayBets();
     document.getElementById('bet-form').reset();
 });
 
-function populateMonthSelect() {
-    const select = document.getElementById('month-select');
-    select.innerHTML = '';
-
-    // Get unique months from all sports
-    const months = new Set();
-    sports.forEach(sport => {
-        bets[sport].forEach(bet => {
-            if (bet.date) {
-                const month = bet.date.slice(0, 7); // YYYY-MM
-                months.add(month);
-            }
+function resetBets() {
+    if (confirm('Are you sure you want to reset all bets? This will delete all your betting data.')) {
+        localStorage.removeItem('bets');
+        bets = {};
+        sports.forEach(sport => {
+            bets[sport] = [];
         });
-    });
-
-    // Add current month
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    months.add(currentMonth);
-
-    // Sort months descending
-    const sortedMonths = Array.from(months).sort().reverse();
-
-    // Populate dropdown
-    sortedMonths.forEach(month => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = new Date(month + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
-        if (month === currentMonth) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    });
+        localStorage.setItem('bets', JSON.stringify(bets));
+        updateStats();
+        displayBets();
+        showAlert('All bets have been reset.', 'success');
+    }
 }
 
 function toggleStatsView() {
@@ -107,13 +85,13 @@ function toggleStatsView() {
 }
 
 function updateStats() {
-    const selectedMonth = document.getElementById('month-select').value || new Date().toISOString().slice(0, 7);
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
     let monthlyWins = 0, monthlyLosses = 0;
 
     if (showAllSportsStats) {
         sports.forEach(sport => {
             bets[sport].forEach(bet => {
-                if (bet.date && bet.date.slice(0, 7) === selectedMonth) {
+                if (bet.date && bet.date.slice(0, 7) === currentMonth) {
                     if (bet.amount > 0) monthlyWins++;
                     else monthlyLosses++;
                 }
@@ -121,7 +99,7 @@ function updateStats() {
         });
     } else {
         bets[currentSport].forEach(bet => {
-            if (bet.date && bet.date.slice(0, 7) === selectedMonth) {
+            if (bet.date && bet.date.slice(0, 7) === currentMonth) {
                 if (bet.amount > 0) monthlyWins++;
                 else monthlyLosses++;
             }
@@ -176,7 +154,6 @@ document.getElementById('edit-form').addEventListener('submit', (e) => {
     bets[currentSport][editIndex] = { teams, date, amount };
     localStorage.setItem('bets', JSON.stringify(bets));
 
-    populateMonthSelect();
     updateStats();
     displayBets();
     bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
@@ -187,7 +164,6 @@ function deleteBet(index) {
         bets[currentSport].splice(index, 1);
         localStorage.setItem('bets', JSON.stringify(bets));
 
-        populateMonthSelect();
         updateStats();
         displayBets();
     }
