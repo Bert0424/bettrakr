@@ -1,4 +1,4 @@
-const sports = ['football', 'baseball', 'basketball', 'hockey', 'soccer'];
+const sports = ['football', 'baseball', 'basketball', 'hockey', 'soccer', 'boxing', 'ufc'];
 let bets = JSON.parse(localStorage.getItem('bets')) || {};
 let currentSport = null;
 let editIndex = null;
@@ -86,22 +86,32 @@ function toggleStatsView() {
 
 function updateStats() {
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-    let monthlyWins = 0, monthlyLosses = 0;
+    let monthlyWins = 0, monthlyLosses = 0, totalAmount = 0;
 
     if (showAllSportsStats) {
         sports.forEach(sport => {
             bets[sport].forEach(bet => {
                 if (bet.date && bet.date.slice(0, 7) === currentMonth) {
-                    if (bet.amount > 0) monthlyWins++;
-                    else monthlyLosses++;
+                    if (bet.amount > 0) {
+                        monthlyWins++;
+                        totalAmount += bet.amount;
+                    } else {
+                        monthlyLosses++;
+                        totalAmount += bet.amount;
+                    }
                 }
             });
         });
     } else {
         bets[currentSport].forEach(bet => {
             if (bet.date && bet.date.slice(0, 7) === currentMonth) {
-                if (bet.amount > 0) monthlyWins++;
-                else monthlyLosses++;
+                if (bet.amount > 0) {
+                    monthlyWins++;
+                    totalAmount += bet.amount;
+                } else {
+                    monthlyLosses++;
+                    totalAmount += bet.amount;
+                }
             }
         });
     }
@@ -109,7 +119,8 @@ function updateStats() {
     const monthlyTotal = monthlyWins + monthlyLosses;
     const monthlyRatio = monthlyTotal ? ((monthlyWins / monthlyTotal) * 100).toFixed(2) : 0;
     const statsElement = document.getElementById('monthly-stats');
-    statsElement.textContent = `Monthly: ${monthlyWins} wins, ${monthlyLosses} losses (${monthlyRatio}%)`;
+    const totalText = totalAmount >= 0 ? `+$${totalAmount.toFixed(2)}` : `-$${Math.abs(totalAmount).toFixed(2)}`;
+    statsElement.textContent = `Monthly: ${monthlyWins} wins, ${monthlyLosses} losses (${monthlyRatio}%), Total: ${totalText}`;
     statsElement.className = monthlyWins > monthlyLosses && monthlyTotal > 0 ? 'green' : 'red';
 }
 
